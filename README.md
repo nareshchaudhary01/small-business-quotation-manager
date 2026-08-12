@@ -19,11 +19,15 @@ The current workspace includes the Django backend scaffolding for the project.
 3. Set the MongoDB Atlas connection values as environment variables:
    - `MONGO_URI` (for example: `mongodb+srv://<username>:<password>@cluster0.mongodb.net`)
    - `MONGO_DB_NAME` (for example: `business_manager`)
-4. Run the Django development server:
+4. Create the Django system tables and run the first migration:
+   ```powershell
+   python manage.py migrate
+   ```
+5. Run the Django development server:
    ```powershell
    python manage.py runserver
    ```
-5. Open `http://127.0.0.1:8000/api/health/` to verify the backend is running.
+6. Open `http://127.0.0.1:8000/api/health/` to verify the backend is running.
 
 ## Next steps
 
