@@ -1,0 +1,24 @@
+# Python
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
+*.env
+.env.*
+venv/
+.venv/
+__pypackages__/
+
+# Node
+node_modules/
+build/
+dist/
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
