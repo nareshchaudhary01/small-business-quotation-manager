@@ -4,6 +4,7 @@
 **/*$py.class
 *.env
 .env.*
+*.sqlite3
 venv/
 .venv/
 __pypackages__/
