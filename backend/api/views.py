@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from .auth import login_required
 from .db import db, check_connection
 from .serializers import (
     CustomerSerializer,
@@ -77,6 +78,7 @@ def health_check(request):
 
 
 @api_view(["GET", "POST"])
+@login_required
 def customer_list_create(request):
     try:
         collection = db[CUSTOMER_COLLECTION]
@@ -97,6 +99,7 @@ def customer_list_create(request):
 
 
 @api_view(["GET", "PUT", "DELETE"])
+@login_required
 def customer_detail(request, customer_id):
     document, error_response = get_object_or_response(CUSTOMER_COLLECTION, customer_id)
     if error_response:
@@ -123,6 +126,7 @@ def customer_detail(request, customer_id):
 
 
 @api_view(["GET", "POST"])
+@login_required
 def product_list_create(request):
     try:
         collection = db[PRODUCT_COLLECTION]
@@ -143,6 +147,7 @@ def product_list_create(request):
 
 
 @api_view(["GET", "PUT", "DELETE"])
+@login_required
 def product_detail(request, product_id):
     document, error_response = get_object_or_response(PRODUCT_COLLECTION, product_id)
     if error_response:
@@ -169,6 +174,7 @@ def product_detail(request, product_id):
 
 
 @api_view(["GET", "POST"])
+@login_required
 def quotation_list_create(request):
     try:
         collection = db[QUOTATION_COLLECTION]
@@ -211,6 +217,7 @@ def quotation_list_create(request):
 
 
 @api_view(["GET", "PUT", "DELETE"])
+@login_required
 def quotation_detail(request, quotation_id):
     document, error_response = get_object_or_response(QUOTATION_COLLECTION, quotation_id)
     if error_response:
@@ -258,6 +265,7 @@ def quotation_detail(request, quotation_id):
 
 
 @api_view(["POST"])
+@login_required
 def quotation_convert_to_order(request, quotation_id):
     quotation, error_response = get_object_or_response(QUOTATION_COLLECTION, quotation_id)
     if error_response:
@@ -292,6 +300,7 @@ def quotation_convert_to_order(request, quotation_id):
 
 
 @api_view(["GET", "POST"])
+@login_required
 def order_list_create(request):
     try:
         collection = db[ORDER_COLLECTION]
@@ -335,6 +344,7 @@ def order_list_create(request):
 
 
 @api_view(["GET", "PUT", "DELETE"])
+@login_required
 def order_detail(request, order_id):
     document, error_response = get_object_or_response(ORDER_COLLECTION, order_id)
     if error_response:

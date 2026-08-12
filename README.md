@@ -40,6 +40,8 @@ The current workspace includes the Django backend scaffolding for the project.
 ## Example API routes available now
 
 - `GET /api/health/` — check server and MongoDB connection status
+- `POST /api/auth/register/` — register a new user with email, password, and name
+- `POST /api/auth/login/` — log in with email and password to get a JWT token
 - `GET /api/customers/` — return the full customer list
 - `POST /api/customers/` — create a new customer
 - `GET /api/customers/<id>/` — fetch one customer
@@ -61,3 +63,12 @@ The current workspace includes the Django backend scaffolding for the project.
 - `GET /api/orders/<id>/` — fetch one order
 - `PUT /api/orders/<id>/` — update an order
 - `DELETE /api/orders/<id>/` — delete an order
+
+## Authentication
+
+The backend supports email/password authentication using JWT tokens.
+
+- `MONGO_URI`, `MONGO_DB_NAME`, and `JWT_SECRET` are required environment variables for deployment.
+- Use `POST /api/auth/register/` to create a new account.
+- Use `POST /api/auth/login/` to receive an access token.
+- Include `Authorization: Bearer <token>` in requests to protected endpoints.

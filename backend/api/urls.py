@@ -1,5 +1,6 @@
 from django.urls import path
 
+from .auth import login, register
 from .views import (
     customer_detail,
     customer_list_create,
@@ -15,6 +16,8 @@ from .views import (
 
 urlpatterns = [
     path("health/", health_check, name="health_check"),
+    path("auth/register/", register, name="auth_register"),
+    path("auth/login/", login, name="auth_login"),
     path("customers/", customer_list_create, name="customer_list_create"),
     path("customers/<str:customer_id>/", customer_detail, name="customer_detail"),
     path("products/", product_list_create, name="product_list_create"),
