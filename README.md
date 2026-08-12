@@ -29,13 +29,45 @@ The current workspace includes the Django backend scaffolding for the project.
    ```
 6. Open `http://127.0.0.1:8000/api/health/` to verify the backend is running.
 
-## Next steps
+## Frontend setup
 
-- Add business models for customers, products, quotations, and orders
-- Implement REST API endpoints for CRUD operations
-- Add JWT authentication for user login and registration
-- Build a React frontend that calls the Django API
-- Deploy the backend on Render and the frontend on Vercel
+The frontend is a responsive React + Tailwind application that works well on desktop, tablet, and mobile.
+
+1. Open a terminal in `frontend/`.
+2. Install dependencies:
+   ```powershell
+   npm install
+   ```
+3. Copy `.env.example` to `.env` and update the API URL if needed:
+   ```powershell
+   copy .env.example .env
+   ```
+4. Run the development frontend:
+   ```powershell
+   npm run dev
+   ```
+5. Open the local URL shown by Vite (for example `http://127.0.0.1:5173`).
+
+## Backend setup
+
+1. Open a terminal in `backend/`.
+2. Install dependencies:
+   ```powershell
+   python -m pip install -r requirements.txt
+   ```
+3. Set the MongoDB Atlas connection values as environment variables:
+   - `MONGO_URI` (for example: `mongodb+srv://<username>:<password>@cluster0.mongodb.net`)
+   - `MONGO_DB_NAME` (for example: `business_manager`)
+   - `JWT_SECRET` (a secure string used for JWT tokens)
+4. Create the Django system tables and run the first migration:
+   ```powershell
+   python manage.py migrate
+   ```
+5. Run the Django development server:
+   ```powershell
+   python manage.py runserver
+   ```
+6. Open `http://127.0.0.1:8000/api/health/` to verify the backend is running.
 
 ## Example API routes available now
 
