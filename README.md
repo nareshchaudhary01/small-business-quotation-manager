@@ -45,3 +45,19 @@ The current workspace includes the Django backend scaffolding for the project.
 - `GET /api/customers/<id>/` — fetch one customer
 - `PUT /api/customers/<id>/` — update a customer
 - `DELETE /api/customers/<id>/` — delete a customer
+- `GET /api/products/` — return the full product list
+- `POST /api/products/` — create a new product
+- `GET /api/products/<id>/` — fetch one product
+- `PUT /api/products/<id>/` — update a product
+- `DELETE /api/products/<id>/` — delete a product
+- `GET /api/quotations/` — return the full quotation list
+- `POST /api/quotations/` — create a new quotation
+- `GET /api/quotations/<id>/` — fetch one quotation
+- `PUT /api/quotations/<id>/` — update a quotation
+- `DELETE /api/quotations/<id>/` — delete a quotation
+- `POST /api/quotations/<id>/convert/` — convert a quotation into an order
+- `GET /api/orders/` — return the full order list
+- `POST /api/orders/` — create a new order
+- `GET /api/orders/<id>/` — fetch one order
+- `PUT /api/orders/<id>/` — update an order
+- `DELETE /api/orders/<id>/` — delete an order
