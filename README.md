@@ -36,3 +36,12 @@ The current workspace includes the Django backend scaffolding for the project.
 - Add JWT authentication for user login and registration
 - Build a React frontend that calls the Django API
 - Deploy the backend on Render and the frontend on Vercel
+
+## Example API routes available now
+
+- `GET /api/health/` — check server and MongoDB connection status
+- `GET /api/customers/` — return the full customer list
+- `POST /api/customers/` — create a new customer
+- `GET /api/customers/<id>/` — fetch one customer
+- `PUT /api/customers/<id>/` — update a customer
+- `DELETE /api/customers/<id>/` — delete a customer
