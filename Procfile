@@ -1,1 +1,1 @@
-web: cd backend && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --log-file -
+web: cd backend && python -m pip install --upgrade pip setuptools wheel && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --log-file -
