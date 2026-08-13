@@ -39,11 +39,11 @@ const Topbar = ({ onLogout, token }) => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`rounded-full px-4 py-2 text-sm transition ${
+                  className={
                     location.pathname === item.path
-                      ? 'bg-slate-900 text-white shadow-lg'
-                      : 'text-slate-300 hover:bg-slate-900/80 hover:text-white'
-                  }`}>
+                      ? 'rounded-full px-4 py-2 text-sm transition bg-slate-900 text-white shadow-lg'
+                      : 'rounded-full px-4 py-2 text-sm transition text-slate-300 hover:bg-slate-900/80 hover:text-white'
+                  }>
                   {item.label}
                 </Link>
               ))}
@@ -56,25 +56,6 @@ const Topbar = ({ onLogout, token }) => {
             </nav>
           </>
         ) : null}
-          {pages.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`rounded-full px-4 py-2 text-sm transition ${
-                location.pathname === item.path
-                  ? 'bg-slate-900 text-white shadow-lg'
-                  : 'text-slate-300 hover:bg-slate-900/80 hover:text-white'
-              }`}>
-              {item.label}
-            </Link>
-          ))}
-          <button
-            onClick={onLogout}
-            className="rounded-full bg-rose-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-400"
-          >
-            Sign out
-          </button>
-        </nav>
       </div>
 
       {mobileOpen && (
@@ -85,11 +66,11 @@ const Topbar = ({ onLogout, token }) => {
                 key={item.path}
                 to={item.path}
                 onClick={() => setMobileOpen(false)}
-                className={`block rounded-2xl px-4 py-3 text-sm transition ${
+                className={
                   location.pathname === item.path
-                    ? 'bg-slate-900 text-white'
-                    : 'text-slate-300 hover:bg-slate-900/80 hover:text-white'
-                }`}>
+                    ? 'block rounded-2xl px-4 py-3 text-sm transition bg-slate-900 text-white'
+                    : 'block rounded-2xl px-4 py-3 text-sm transition text-slate-300 hover:bg-slate-900/80 hover:text-white'
+                }>
                 {item.label}
               </Link>
             ))}
