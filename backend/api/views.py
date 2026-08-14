@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from bson import ObjectId
 from pymongo.errors import PyMongoError
@@ -206,8 +206,8 @@ def quotation_list_create(request):
             "tax": validated_data.get("tax", 0.0),
             "subtotal": subtotal,
             "total": total,
-            "created_at": datetime.utcnow(),
-            "updated_at": datetime.utcnow(),
+            "created_at": datetime.now(timezone.utc),
+            "updated_at": datetime.now(timezone.utc),
         }
         result = collection.insert_one(document)
         created = collection.find_one({"_id": result.inserted_id})
@@ -252,7 +252,7 @@ def quotation_detail(request, quotation_id):
                 "tax": validated_data.get("tax", 0.0),
                 "subtotal": subtotal,
                 "total": total,
-                "updated_at": datetime.utcnow(),
+                "updated_at": datetime.now(timezone.utc),
             }
             collection.update_one({"_id": document["_id"]}, {"$set": updated_data})
             updated = collection.find_one({"_id": document["_id"]})
@@ -285,13 +285,13 @@ def quotation_convert_to_order(request, quotation_id):
             "tax": quotation.get("tax", 0.0),
             "subtotal": quotation.get("subtotal", 0.0),
             "total": quotation.get("total", 0.0),
-            "created_at": datetime.utcnow(),
-            "updated_at": datetime.utcnow(),
+            "created_at": datetime.now(timezone.utc),
+            "updated_at": datetime.now(timezone.utc),
         }
         order_result = db[ORDER_COLLECTION].insert_one(order_document)
         db[QUOTATION_COLLECTION].update_one(
             {"_id": quotation["_id"]},
-            {"$set": {"status": "converted", "updated_at": datetime.utcnow()}},
+            {"$set": {"status": "converted", "updated_at": datetime.now(timezone.utc)}},
         )
         created_order = db[ORDER_COLLECTION].find_one({"_id": order_result.inserted_id})
         return Response(serialize_document(created_order, "order"), status=status.HTTP_201_CREATED)
@@ -333,8 +333,8 @@ def order_list_create(request):
             "tax": validated_data.get("tax", 0.0),
             "subtotal": subtotal,
             "total": total,
-            "created_at": datetime.utcnow(),
-            "updated_at": datetime.utcnow(),
+            "created_at": datetime.now(timezone.utc),
+            "updated_at": datetime.now(timezone.utc),
         }
         result = collection.insert_one(document)
         created = collection.find_one({"_id": result.inserted_id})
@@ -380,7 +380,7 @@ def order_detail(request, order_id):
                 "tax": validated_data.get("tax", 0.0),
                 "subtotal": subtotal,
                 "total": total,
-                "updated_at": datetime.utcnow(),
+                "updated_at": datetime.now(timezone.utc),
             }
             collection.update_one({"_id": document["_id"]}, {"$set": updated_data})
             updated = collection.find_one({"_id": document["_id"]})

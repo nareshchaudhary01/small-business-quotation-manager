@@ -1,7 +1,7 @@
 ﻿import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8002/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -26,7 +26,10 @@ export const createProduct = (payload) => api.post('/products/', payload);
 export const updateProduct = (id, payload) => api.put(`/products/${id}/`, payload);
 export const deleteProduct = (id) => api.delete(`/products/${id}/`);
 export const getQuotations = () => api.get('/quotations/');
+export const getQuotation = (id) => api.get(`/quotations/${id}/`);
 export const createQuotation = (payload) => api.post('/quotations/', payload);
+export const updateQuotation = (id, payload) => api.put(`/quotations/${id}/`, payload);
+export const deleteQuotation = (id) => api.delete(`/quotations/${id}/`);
 export const convertQuotation = (id) => api.post(`/quotations/${id}/convert/`);
 export const getOrders = () => api.get('/orders/');
 export const createOrder = (payload) => api.post('/orders/', payload);

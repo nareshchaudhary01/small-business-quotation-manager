@@ -24,10 +24,23 @@ class FakeCollection:
         return list(self._data.values())
 
     def find_one(self, query: Dict[str, Any]):
-        _id = query.get("_id")
-        if _id is None:
+        if not query:
             return None
-        return self._data.get(str(_id))
+        # Support matching by any field, not just _id
+        for doc in self._data.values():
+            match = True
+            for key, value in query.items():
+                if key == "_id":
+                    if str(doc.get("_id")) != str(value):
+                        match = False
+                        break
+                else:
+                    if doc.get(key) != value:
+                        match = False
+                        break
+            if match:
+                return doc
+        return None
 
     def insert_one(self, document: Dict[str, Any]):
         oid = ObjectId()
@@ -37,25 +50,56 @@ class FakeCollection:
         return FakeInsertResult(oid)
 
     def update_one(self, query: Dict[str, Any], update: Dict[str, Any]):
-        _id = query.get("_id")
-        if _id is None:
+        # Find the document matching the query (any field)
+        doc_key = None
+        for key, doc in self._data.items():
+            match = True
+            for q_key, q_value in query.items():
+                if q_key == "_id":
+                    if str(doc.get("_id")) != str(q_value):
+                        match = False
+                        break
+                else:
+                    if doc.get(q_key) != q_value:
+                        match = False
+                        break
+            if match:
+                doc_key = key
+                break
+        
+        if doc_key is None:
             return
-        key = str(_id)
-        if key not in self._data:
-            return
+        
         # Support {$set: {...}}
         if "$set" in update:
             for k, v in update["$set"].items():
-                self._data[key][k] = v
+                self._data[doc_key][k] = v
         else:
             for k, v in update.items():
-                self._data[key][k] = v
+                self._data[doc_key][k] = v
 
     def delete_one(self, query: Dict[str, Any]):
-        _id = query.get("_id")
-        if _id is None:
+        # Find the document matching the query (any field)
+        doc_key = None
+        for key, doc in self._data.items():
+            match = True
+            for q_key, q_value in query.items():
+                if q_key == "_id":
+                    if str(doc.get("_id")) != str(q_value):
+                        match = False
+                        break
+                else:
+                    if doc.get(q_key) != q_value:
+                        match = False
+                        break
+            if match:
+                doc_key = key
+                break
+        
+        if doc_key is None:
             return
-        self._data.pop(str(_id), None)
+        
+        self._data.pop(doc_key, None)
 
     def count_documents(self, query: Dict[str, Any] = None):
         if not query:

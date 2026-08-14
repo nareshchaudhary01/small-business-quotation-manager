@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from functools import wraps
 
 from bson import ObjectId
@@ -21,7 +21,7 @@ JWT_EXPIRE_MINUTES = int(os.environ.get("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "1440
 
 
 def create_access_token(user_id, email):
-    expires = datetime.utcnow() + timedelta(minutes=JWT_EXPIRE_MINUTES)
+    expires = datetime.now(timezone.utc) + timedelta(minutes=JWT_EXPIRE_MINUTES)
     payload = {
         "user_id": str(user_id),
         "email": email,
@@ -94,8 +94,8 @@ def register(request):
         "name": validated_data["name"].strip(),
         "email": email,
         "password_hash": make_password(validated_data["password"]),
-        "created_at": datetime.utcnow(),
-        "updated_at": datetime.utcnow(),
+        "created_at": datetime.now(timezone.utc),
+        "updated_at": datetime.now(timezone.utc),
     }
     result = db[USER_COLLECTION].insert_one(user_document)
     user_document = db[USER_COLLECTION].find_one({"_id": result.inserted_id})
