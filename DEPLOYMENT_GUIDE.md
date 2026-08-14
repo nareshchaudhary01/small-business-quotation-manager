@@ -60,7 +60,7 @@ This guide will help you deploy the entire application in under 15 minutes using
    DJANGO_SECRET_KEY=django-insecure-change-this-to-a-random-50-char-string-xyz123abc456def789
    DJANGO_DEBUG=False
    ALLOWED_HOSTS=bizquote-api.onrender.com
-   MONGO_URI=mongodb+srv://bizuser:BusinessManager123!@business-manager.xxxxx.mongodb.net/?retryWrites=true&w=majority
+   MONGO_URI=mongodb+srv://nareshhdangi_db_user:lBtK2okBVagDj7SD@bizuser.3gfnlri.mongodb.net/?appName=bizuser
    MONGO_DB_NAME=business_manager
    JWT_SECRET=another-random-secret-key-minimum-32-characters-long
    CORS_ALLOWED_ORIGINS=http://localhost:5173,https://localhost:5173
