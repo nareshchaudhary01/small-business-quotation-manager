@@ -24,12 +24,12 @@ services:
 
   - type: web
     name: bizquote-web
-    env: static
+    runtime: node
     region: oregon
     plan: free
     rootDirectory: frontend
     buildCommand: npm install && npm run build
-    staticPublishDirectory: dist
+    startCommand: npx serve dist -l $PORT
     envVars:
       - key: VITE_API_BASE_URL
         value: https://bizquote-api.onrender.com/api
