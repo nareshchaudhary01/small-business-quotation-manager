@@ -1,106 +1,207 @@
 # Small Business Quotation & Order Manager
 
-This project is a full-stack learning application for building a simple quotation and order management system using Python, Django, Django REST Framework, MongoDB Atlas, React, and GitHub.
+A full-stack quotation and order management system using Django REST Framework, MongoDB Atlas, React, and Vite.
 
-The current workspace includes the Django backend scaffolding for the project.
-
-## Current project structure
+## Project Structure
 
 - `backend/` — Django backend and REST API
-- `frontend/` — placeholder for the React frontend
+- `frontend/` — React + Vite frontend with Tailwind CSS
 
-## Backend setup
+## Local Development
 
-1. Open a terminal in `backend/`.
+### Backend Setup
+
+1. Open a terminal in `backend/`
 2. Install dependencies:
    ```powershell
    python -m pip install -r requirements.txt
    ```
-3. Set the MongoDB Atlas connection values as environment variables:
-   - `MONGO_URI` (for example: `mongodb+srv://<username>:<password>@cluster0.mongodb.net`)
-   - `MONGO_DB_NAME` (for example: `business_manager`)
-4. Create the Django system tables and run the first migration:
+3. Set environment variables (or use defaults for local testing):
+   - `MONGO_URI` (default: `mongodb://localhost:27017`)
+   - `MONGO_DB_NAME` (default: `business_manager`)
+   - `DJANGO_SECRET_KEY` (default: insecure key for local only)
+   - `JWT_SECRET` (default: insecure key for local only)
+4. Run migrations:
    ```powershell
    python manage.py migrate
    ```
-5. Run the Django development server:
+5. Start the server:
    ```powershell
    python manage.py runserver
    ```
-6. Open `http://127.0.0.1:8000/api/health/` to verify the backend is running.
+6. Verify at `http://127.0.0.1:8000/api/health/`
 
-## Frontend setup
+### Frontend Setup
 
-The frontend is a responsive React + Tailwind application that works well on desktop, tablet, and mobile.
-
-1. Open a terminal in `frontend/`.
+1. Open a terminal in `frontend/`
 2. Install dependencies:
    ```powershell
    npm install
    ```
-3. Copy `.env.example` to `.env` and update the API URL if needed:
+3. Copy `.env.example` to `.env`:
    ```powershell
    copy .env.example .env
    ```
-4. Run the development frontend:
+4. Start the dev server:
    ```powershell
    npm run dev
    ```
-5. Open the local URL shown by Vite (for example `http://127.0.0.1:5173`).
+5. Open the URL shown (typically `http://127.0.0.1:5173`)
 
-## Backend setup
+## Production Deployment
 
-1. Open a terminal in `backend/`.
-2. Install dependencies:
-   ```powershell
-   python -m pip install -r requirements.txt
+### Architecture
+
+- **Frontend**: Vercel (React SPA)
+- **Backend**: Render (Django REST API)
+- **Database**: MongoDB Atlas
+
+### Step 1: MongoDB Atlas Setup
+
+1. Go to [mongodb.com/atlas](https://mongodb.com/atlas) and sign up/login
+2. Create a free M0 cluster
+3. **Database Access**: Add a new database user
+   - Username: `bizuser` (or your choice)
+   - Password: Use a strong password (save this!)
+   - Role: Read and write to any database
+4. **Network Access**: Add IP `0.0.0.0/0` to allow from anywhere
+5. Click **Connect** → **Drivers** → **Python**
+6. Copy the connection string:
    ```
-3. Set the MongoDB Atlas connection values as environment variables:
-   - `MONGO_URI` (for example: `mongodb+srv://<username>:<password>@cluster0.mongodb.net`)
-   - `MONGO_DB_NAME` (for example: `business_manager`)
-   - `JWT_SECRET` (a secure string used for JWT tokens)
-4. Create the Django system tables and run the first migration:
-   ```powershell
-   python manage.py migrate
+   mongodb+srv://bizuser:YourPassword@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority
    ```
-5. Run the Django development server:
-   ```powershell
-   python manage.py runserver
+
+### Step 2: Deploy Backend to Render
+
+1. Go to [dashboard.render.com](https://dashboard.render.com) and sign up/login
+2. Click **New +** → **Web Service**
+3. Connect your GitHub repo: `nareshchaudhary01/small-business-quotation-manager`
+4. Configure settings:
+
+   | Setting | Value |
+   |---------|-------|
+   | Name | `bizquote-api` |
+   | Region | Closest to you |
+   | Branch | `main` |
+   | Root Directory | `backend` |
+   | Runtime | `Python 3` |
+   | Build Command | `pip install -r requirements.txt` |
+   | Start Command | `gunicorn config.wsgi:application --bind 0.0.0.0:$PORT` |
+   | Plan | Free |
+
+5. Click **Advanced** → **Add Environment Variable**:
+
    ```
-6. Open `http://127.0.0.1:8000/api/health/` to verify the backend is running.
+   DJANGO_SECRET_KEY=generate-a-50-char-random-string-here
+   DJANGO_DEBUG=False
+   ALLOWED_HOSTS=bizquote-api.onrender.com
+   MONGO_URI=mongodb+srv://bizuser:YourPassword@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority
+   MONGO_DB_NAME=business_manager
+   JWT_SECRET=generate-another-32-char-random-string-here
+   CORS_ALLOWED_ORIGINS=https://your-frontend-url.vercel.app
+   ```
 
-## Example API routes available now
+6. Click **Deploy Web Service**
 
-- `GET /api/health/` — check server and MongoDB connection status
-- `POST /api/auth/register/` — register a new user with email, password, and name
-- `POST /api/auth/login/` — log in with email and password to get a JWT token
-- `GET /api/customers/` — return the full customer list
-- `POST /api/customers/` — create a new customer
-- `GET /api/customers/<id>/` — fetch one customer
-- `PUT /api/customers/<id>/` — update a customer
-- `DELETE /api/customers/<id>/` — delete a customer
-- `GET /api/products/` — return the full product list
-- `POST /api/products/` — create a new product
-- `GET /api/products/<id>/` — fetch one product
-- `PUT /api/products/<id>/` — update a product
-- `DELETE /api/products/<id>/` — delete a product
-- `GET /api/quotations/` — return the full quotation list
-- `POST /api/quotations/` — create a new quotation
-- `GET /api/quotations/<id>/` — fetch one quotation
-- `PUT /api/quotations/<id>/` — update a quotation
-- `DELETE /api/quotations/<id>/` — delete a quotation
-- `POST /api/quotations/<id>/convert/` — convert a quotation into an order
-- `GET /api/orders/` — return the full order list
-- `POST /api/orders/` — create a new order
-- `GET /api/orders/<id>/` — fetch one order
-- `PUT /api/orders/<id>/` — update an order
-- `DELETE /api/orders/<id>/` — delete an order
+### Step 3: Deploy Frontend to Vercel
+
+1. Go to [vercel.com](https://vercel.com) and sign up/login
+2. Click **Add New** → **Project**
+3. Import your GitHub repo
+4. Configure settings:
+
+   | Setting | Value |
+   |---------|-------|
+   | Framework Preset | Vite |
+   | Root Directory | `frontend` |
+   | Build Command | `npm install && npm run build` |
+   | Output Directory | `dist` |
+
+5. Click **Environment Variables** → Add:
+
+   ```
+   VITE_API_BASE_URL=https://bizquote-api.onrender.com/api
+   ```
+
+6. Click **Deploy**
+
+### Step 4: Update CORS Settings
+
+After both deployments are live:
+
+1. Go to your Render backend service
+2. Update `CORS_ALLOWED_ORIGINS` to include your actual Vercel URL:
+   ```
+   CORS_ALLOWED_ORIGINS=https://your-project.vercel.app
+   ```
+3. Redeploy the backend
+
+## API Endpoints
+
+### Authentication
+- `POST /api/auth/register/` — Register new user
+- `POST /api/auth/login/` — Login and get JWT token
+
+### Customers
+- `GET /api/customers/` — List all customers
+- `POST /api/customers/` — Create customer
+- `GET /api/customers/<id>/` — Get customer details
+- `PUT /api/customers/<id>/` — Update customer
+- `DELETE /api/customers/<id>/` — Delete customer
+
+### Products
+- `GET /api/products/` — List all products
+- `POST /api/products/` — Create product
+- `GET /api/products/<id>/` — Get product details
+- `PUT /api/products/<id>/` — Update product
+- `DELETE /api/products/<id>/` — Delete product
+
+### Quotations
+- `GET /api/quotations/` — List all quotations
+- `POST /api/quotations/` — Create quotation
+- `GET /api/quotations/<id>/` — Get quotation details
+- `PUT /api/quotations/<id>/` — Update quotation
+- `DELETE /api/quotations/<id>/` — Delete quotation
+- `POST /api/quotations/<id>/convert/` — Convert quotation to order
+
+### Orders
+- `GET /api/orders/` — List all orders
+- `POST /api/orders/` — Create order
+- `GET /api/orders/<id>/` — Get order details
+- `PUT /api/orders/<id>/` — Update order
+- `DELETE /api/orders/<id>/` — Delete order
+
+### Health
+- `GET /api/health/` — Check server and MongoDB status
 
 ## Authentication
 
-The backend supports email/password authentication using JWT tokens.
+All protected endpoints require:
+```
+Authorization: Bearer <your-jwt-token>
+```
 
-- `MONGO_URI`, `MONGO_DB_NAME`, and `JWT_SECRET` are required environment variables for deployment.
-- Use `POST /api/auth/register/` to create a new account.
-- Use `POST /api/auth/login/` to receive an access token.
-- Include `Authorization: Bearer <token>` in requests to protected endpoints.
+Get your token from `/api/auth/login/` and include it in the request headers.
+
+## Environment Variables
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `DJANGO_SECRET_KEY` | Django secret key | Yes (production) |
+| `DJANGO_DEBUG` | Debug mode (True/False) | No (default: False) |
+| `ALLOWED_HOSTS` | Comma-separated allowed hosts | No (default: localhost,127.0.0.1) |
+| `MONGO_URI` | MongoDB connection string | Yes |
+| `MONGO_DB_NAME` | MongoDB database name | Yes |
+| `JWT_SECRET` | JWT signing secret | Yes (production) |
+| `CORS_ALLOWED_ORIGINS` | Comma-separated CORS origins | No (default: localhost URLs) |
+
+## Recent Bug Fixes
+
+- ✅ Fixed Fake DB queries to match any field (not just _id)
+- ✅ Replaced deprecated `datetime.utcnow()` with `datetime.now(timezone.utc)`
+- ✅ Added missing API functions (getQuotation, updateQuotation, deleteQuotation)
+- ✅ Hardened Django security (DEBUG=False by default, proper CORS)
+- ✅ Added WhiteNoise for production static file serving
+- ✅ Fixed port mismatch from 8002 to 8000
+- ✅ URL routes already correct (customers/<str:customer_id>/)
+- ✅ React components have proper hooks and state management
