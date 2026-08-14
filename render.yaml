@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: bizquote-api
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --log-file -
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        value: django-insecure-xk9m2n4p6q8r1s3t5u7v9w0y2z4a6c8e0g2i4k6m8n0p2q4r6s8t0u2v4w6x8
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: bizquote-api.onrender.com,bizquote-web.onrender.com
+      - key: MONGO_URI
+        value: mongodb+srv://nareshhdangi_db_user:lBtK2okBVagDj7SD@bizuser.3gfnlri.mongodb.net/?appName=bizuser
+      - key: MONGO_DB_NAME
+        value: business_manager
+      - key: JWT_SECRET
+        value: jwt-secret-key-32-chars-minimum-length-xyz123
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://bizquote-web.onrender.com
+
+  - type: web
+    name: bizquote-web
+    env: static
+    region: oregon
+    plan: free
+    rootDirectory: frontend
+    buildCommand: npm install && npm run build
+    staticPublishDirectory: dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://bizquote-api.onrender.com/api
