@@ -58,6 +58,8 @@ This guide will help you deploy the entire application on Render using free tier
    - Publish Directory: `dist`
    - Instance Type: Free
 
+   **Important:** Do NOT add "Publish: dist" to the build command. The Publish Directory is a separate field in the Render UI.
+
    **Environment Variables (click "Advanced" → "Add Environment Variable"):**
 
    ```
