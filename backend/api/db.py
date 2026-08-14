@@ -27,25 +27,26 @@ class FakeCollection:
         self._name = name
         self._data: Dict[str, Dict[str, Any]] = {}
 
+    def _matches(self, document: Dict[str, Any], query: Dict[str, Any]) -> bool:
+        if not query:
+            return True
+        for key, value in query.items():
+            if key == "_id":
+                if str(document.get("_id")) != str(value):
+                    return False
+            else:
+                if document.get(key) != value:
+                    return False
+        return True
+
     def find(self, *args, **kwargs):
         return list(self._data.values())
 
     def find_one(self, query: Dict[str, Any]):
         if not query:
             return None
-        # Support matching by any field, not just _id
         for doc in self._data.values():
-            match = True
-            for key, value in query.items():
-                if key == "_id":
-                    if str(doc.get("_id")) != str(value):
-                        match = False
-                        break
-                else:
-                    if doc.get(key) != value:
-                        match = False
-                        break
-            if match:
+            if self._matches(doc, query):
                 return doc
         return None
 
@@ -56,65 +57,34 @@ class FakeCollection:
         self._data[str(oid)] = doc
         return FakeInsertResult(oid)
 
+    def insert_many(self, documents: List[Dict[str, Any]]):
+        inserted = []
+        for document in documents:
+            result = self.insert_one(document)
+            inserted.append(result.inserted_id)
+        return type("FakeInsertManyResult", (), {"inserted_ids": inserted})()
+
     def update_one(self, query: Dict[str, Any], update: Dict[str, Any]):
-        # Find the document matching the query (any field)
-        doc_key = None
-        for key, doc in self._data.items():
-            match = True
-            for q_key, q_value in query.items():
-                if q_key == "_id":
-                    if str(doc.get("_id")) != str(q_value):
-                        match = False
-                        break
+        for doc_key, doc in self._data.items():
+            if self._matches(doc, query):
+                if "$set" in update:
+                    for k, v in update["$set"].items():
+                        self._data[doc_key][k] = v
                 else:
-                    if doc.get(q_key) != q_value:
-                        match = False
-                        break
-            if match:
-                doc_key = key
-                break
-        
-        if doc_key is None:
-            return
-        
-        # Support {$set: {...}}
-        if "$set" in update:
-            for k, v in update["$set"].items():
-                self._data[doc_key][k] = v
-        else:
-            for k, v in update.items():
-                self._data[doc_key][k] = v
+                    for k, v in update.items():
+                        self._data[doc_key][k] = v
+                return
 
     def delete_one(self, query: Dict[str, Any]):
-        # Find the document matching the query (any field)
-        doc_key = None
-        for key, doc in self._data.items():
-            match = True
-            for q_key, q_value in query.items():
-                if q_key == "_id":
-                    if str(doc.get("_id")) != str(q_value):
-                        match = False
-                        break
-                else:
-                    if doc.get(q_key) != q_value:
-                        match = False
-                        break
-            if match:
-                doc_key = key
-                break
-        
-        if doc_key is None:
-            return
-        
-        self._data.pop(doc_key, None)
+        for doc_key, doc in list(self._data.items()):
+            if self._matches(doc, query):
+                self._data.pop(doc_key, None)
+                return
 
     def count_documents(self, query: Dict[str, Any] = None):
         if not query:
             return len(self._data)
-        # very simple matching for _id
-        if "_id" in query:
-            return 1 if str(query["_id"]) in self._data else 0
-        return len(self._data)
+        return sum(1 for doc in self._data.values() if self._matches(doc, query))
 
 
 class FakeDB:
