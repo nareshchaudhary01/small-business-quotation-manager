@@ -3,6 +3,7 @@ from bson import ObjectId
 from datetime import datetime
 
 from api.db import db, check_connection
+from django.contrib.auth.hashers import make_password
 
 USER_COLLECTION = "users"
 CUSTOMER_COLLECTION = "customers"
@@ -11,6 +12,10 @@ QUOTATION_COLLECTION = "quotations"
 ORDER_COLLECTION = "orders"
 
 DEMO_MARKER = {"demo_seed": True}
+
+# Demo credentials (idempotent and safe for a demo environment)
+DEMO_USER_EMAIL = "demo@example.com"
+DEMO_USER_PASSWORD = "DemoPass123!"
 
 class Command(BaseCommand):
     help = "Seed demo data into the MongoDB database (idempotent)."
@@ -27,8 +32,8 @@ class Command(BaseCommand):
             self.stdout.write("Creating demo user...")
             user = {
                 "name": "Demo User",
-                "email": "demo@example.com",
-                "password_hash": "",  # not used for demo login via API
+                "email": DEMO_USER_EMAIL,
+                "password_hash": make_password(DEMO_USER_PASSWORD),
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow(),
                 **DEMO_MARKER,
