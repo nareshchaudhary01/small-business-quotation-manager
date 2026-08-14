@@ -74,7 +74,19 @@ def compute_totals(items, discount, tax):
 def health_check(request):
     connected = check_connection()
     status_text = "connected" if connected else "disconnected"
-    return Response({"status": "ok", "database": status_text})
+    response = {"status": "ok", "database": status_text}
+    if not connected:
+        # Include a short non-secret error message when the real DB is disconnected
+        try:
+            from .db import get_connection_error
+
+            err = get_connection_error()
+            if err is not None:
+                response["error"] = str(err)
+        except Exception:
+            # Don't break health check if error introspection fails
+            pass
+    return Response(response)
 
 
 @api_view(["GET", "POST"])

@@ -1,9 +1,16 @@
 import os
+from pathlib import Path
 from typing import Any, Dict, List
+
+from dotenv import load_dotenv
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")
 
 from bson import ObjectId
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
+import certifi
 
 MONGO_URI = os.environ.get("MONGO_URI", "mongodb://localhost:27017")
 MONGO_DB_NAME = os.environ.get("MONGO_DB_NAME", "business_manager")
@@ -120,30 +127,52 @@ class FakeDB:
         return self._collections[name]
 
 
-# Try to connect to real MongoDB; fall back to fake in DEMO_MODE or on connection failure.
+# Connection management
 client = None
 db = None
 _use_fake = False
+_connection_error = None
 
-try:
-    if not DEMO_MODE:
-        client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+if DEMO_MODE:
+    # Explicit demo mode: use in-memory fake DB
+    _use_fake = True
+    db = FakeDB()
+else:
+    # Attempt to connect to real MongoDB Atlas; do NOT silently fall back on error
+    try:
+        # Use certifi CA bundle to help with TLS verification across environments
+        client = MongoClient(MONGO_URI, tls=True, tlsCAFile=certifi.where(), serverSelectionTimeoutMS=5000)
         # attempt a ping to verify the connection
         client.admin.command("ping")
         db = client[MONGO_DB_NAME]
-    else:
-        raise ConnectionFailure("Demo mode enabled, using fake DB")
-except Exception:
-    # Fall back to an in-memory fake DB implementation suitable for local testing
-    _use_fake = True
-    db = FakeDB()
+    except Exception as exc:
+        # Record the connection error and keep db=None. Do not enable FakeDB.
+        _connection_error = exc
+        client = None
+        db = None
+        _use_fake = False
 
 
 def check_connection():
+    """Return True if the effective database is connected.
+
+    - If DEMO_MODE (fake DB) is active, return True.
+    - If a real client exists, try pinging it.
+    - Otherwise return False.
+    """
+    global _connection_error
     if _use_fake:
         return True
+    if client is None:
+        return False
     try:
         client.admin.command("ping")
         return True
-    except ConnectionFailure:
+    except Exception as exc:
+        _connection_error = exc
         return False
+
+
+def get_connection_error():
+    """Return the last MongoDB connection exception, or None."""
+    return _connection_error
