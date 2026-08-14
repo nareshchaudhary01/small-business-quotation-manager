@@ -24,7 +24,7 @@ services:
 
   - type: web
     name: bizquote-web
-    runtime: node
+    env: node
     region: oregon
     plan: free
     rootDirectory: frontend
