@@ -20,7 +20,11 @@ const Register = ({ onRegistered }) => {
       setAuthToken(token);
       onRegistered(token);
     } catch (err) {
-      const message = err.response?.data?.detail || 'Registration failed. Please try again.';
+      const message =
+        err.response?.data?.detail ||
+        (err.response?.data && JSON.stringify(err.response.data)) ||
+        err.message ||  
+        'Registration failed. Please try again.';
       setError(message);
     } finally {
       setLoading(false);

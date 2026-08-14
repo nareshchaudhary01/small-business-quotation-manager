@@ -80,35 +80,38 @@ def serialize_user(user):
 
 @api_view(["POST"])
 def register(request):
-    serializer = RegisterSerializer(data=request.data)
-    if not serializer.is_valid():
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        serializer = RegisterSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    validated_data = serializer.validated_data
-    email = validated_data["email"].lower().strip()
-    existing = db[USER_COLLECTION].count_documents({"email": email})
-    if existing > 0:
-        return Response({"detail": "Email is already registered."}, status=status.HTTP_400_BAD_REQUEST)
+        validated_data = serializer.validated_data
+        email = validated_data["email"].lower().strip()
+        existing = db[USER_COLLECTION].count_documents({"email": email})
+        if existing > 0:
+            return Response({"detail": "Email is already registered."}, status=status.HTTP_400_BAD_REQUEST)
 
-    user_document = {
-        "name": validated_data["name"].strip(),
-        "email": email,
-        "password_hash": make_password(validated_data["password"]),
-        "created_at": datetime.now(timezone.utc),
-        "updated_at": datetime.now(timezone.utc),
-    }
-    result = db[USER_COLLECTION].insert_one(user_document)
-    user_document = db[USER_COLLECTION].find_one({"_id": result.inserted_id})
-    access_token = create_access_token(result.inserted_id, email)
+        user_document = {
+            "name": validated_data["name"].strip(),
+            "email": email,
+            "password_hash": make_password(validated_data["password"]),
+            "created_at": datetime.now(timezone.utc),
+            "updated_at": datetime.now(timezone.utc),
+        }
+        result = db[USER_COLLECTION].insert_one(user_document)
+        user_document = db[USER_COLLECTION].find_one({"_id": result.inserted_id})
+        access_token = create_access_token(result.inserted_id, email)
 
-    return Response(
-        {
-            "user": serialize_user(user_document),
-            "access": access_token,
-            "token_type": "Bearer",
-        },
-        status=status.HTTP_201_CREATED,
-    )
+        return Response(
+            {
+                "user": serialize_user(user_document),
+                "access": access_token,
+                "token_type": "Bearer",
+            },
+            status=status.HTTP_201_CREATED,
+        )
+    except Exception as exc:
+        return Response({"detail": f"Registration failed: {exc}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(["POST"])
