@@ -22,6 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
     # Serve the frontend index page at root and for client-side routes
-    # Catch-all (excluding API and admin) ensures paths like /register are handled by React router
-    re_path(r'^(?!api/|admin/).*$', TemplateView.as_view(template_name='index.html')),
+    # Catch-all (excluding API, admin and static) ensures paths like /register are handled by React router
+    # Do NOT match /static/ so static asset requests are served by WhiteNoise and not the index view.
+    re_path(r'^(?!api/|admin/|static/).*$', TemplateView.as_view(template_name='index.html')),
 ]
