@@ -1,46 +1,17 @@
-# Quick Deployment Guide (Free Tier)
+# Quick Deployment Guide (Free Tier - All on Render)
 
-This guide will help you deploy the entire application in under 15 minutes using free tiers.
+This guide will help you deploy the entire application on Render using free tiers.
 
 ## Prerequisites
 
 - GitHub account (already connected)
-- MongoDB Atlas account (free)
+- MongoDB Atlas account (free) ✅ Already done
 - Render account (free)
-- Vercel account (free)
 
-## Step 1: MongoDB Atlas (5 minutes)
-
-1. Go to https://www.mongodb.com/cloud/atlas/signup
-2. Sign up with your email (nareshhdangi@gmail.com)
-3. Create a free M0 cluster:
-   - Click "Build a Database"
-   - Select "M0 Free" (512MB storage)
-   - Choose a region closest to you
-   - Cluster name: `business-manager`
-   - Click "Create"
-
-4. Create database user:
-   - Go to "Database Access" → "Add New Database User"
-   - Username: `bizuser`
-   - Password: `BusinessManager123!` (save this!)
-   - Role: "Read and write to any database"
-   - Click "Add User"
-
-5. Allow network access:
-   - Go to "Network Access" → "Add IP Address"
-   - Select "Allow Access from Anywhere" (0.0.0.0/0)
-   - Click "Confirm"
-
-6. Get connection string:
-   - Go to "Database" → Click "Connect"
-   - Select "Drivers" → "Python"
-   - Copy the connection string (replace <password> with your password)
-
-## Step 2: Deploy Backend to Render (5 minutes)
+## Step 1: Deploy Backend to Render (5 minutes)
 
 1. Go to https://dashboard.render.com/register
-2. Sign up with GitHub (recommended) or email
+2. Sign up with GitHub (recommended)
 3. Click "New +" → "Web Service"
 4. Connect your GitHub repo: `nareshchaudhary01/small-business-quotation-manager`
 5. Configure:
@@ -55,58 +26,63 @@ This guide will help you deploy the entire application in under 15 minutes using
    - Start Command: `gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --log-file -`
    - Instance Type: Free
 
-   **Environment Variables (click "Advanced"):**
+   **Environment Variables (click "Advanced" → "Add Environment Variable" for each):**
+
    ```
-   DJANGO_SECRET_KEY=django-insecure-change-this-to-a-random-50-char-string-xyz123abc456def789
+   DJANGO_SECRET_KEY=django-insecure-xk9m2n4p6q8r1s3t5u7v9w0y2z4a6c8e0g2i4k6m8n0p2q4r6s8t0u2v4w6x8
    DJANGO_DEBUG=False
-   ALLOWED_HOSTS=bizquote-api.onrender.com
+   ALLOWED_HOSTS=bizquote-api.onrender.com,bizquote-web.onrender.com
    MONGO_URI=mongodb+srv://nareshhdangi_db_user:lBtK2okBVagDj7SD@bizuser.3gfnlri.mongodb.net/?appName=bizuser
    MONGO_DB_NAME=business_manager
-   JWT_SECRET=another-random-secret-key-minimum-32-characters-long
-   CORS_ALLOWED_ORIGINS=http://localhost:5173,https://localhost:5173
+   JWT_SECRET=jwt-secret-key-32-chars-minimum-length-xyz123
+   CORS_ALLOWED_ORIGINS=https://bizquote-web.onrender.com
    ```
 
 6. Click "Deploy Web Service"
 7. Wait for deployment (2-3 minutes)
 8. Copy your backend URL: `https://bizquote-api.onrender.com`
 
-## Step 3: Deploy Frontend to Vercel (3 minutes)
+## Step 2: Deploy Frontend to Render Static Site (3 minutes)
 
-1. Go to https://vercel.com/signup
-2. Sign up with GitHub (recommended)
-3. Click "Add New" → "Project"
-4. Import your GitHub repo: `nareshchaudhary01/small-business-quotation-manager`
-5. Configure:
+1. Go to https://dashboard.render.com (same account as backend)
+2. Click "New +" → "Static Site"
+3. Connect your GitHub repo: `nareshchaudhary01/small-business-quotation-manager`
+4. Configure:
 
-   **Framework Preset:** Vite
-   **Root Directory:** `frontend`
-   **Build Command:** `npm install && npm run build`
-   **Output Directory:** `dist`
+   **Basic Settings:**
+   - Name: `bizquote-web`
+   - Region: Same as backend (Oregon US West)
+   - Branch: `main`
+   - Root Directory: `frontend`
+   - Build Command: `npm install && npm run build`
+   - Publish Directory: `dist`
+   - Instance Type: Free
 
-   **Environment Variables:**
+   **Environment Variables (click "Advanced" → "Add Environment Variable"):**
+
    ```
    VITE_API_BASE_URL=https://bizquote-api.onrender.com/api
    ```
 
-6. Click "Deploy"
-7. Wait for deployment (1-2 minutes)
-8. Copy your frontend URL: `https://your-project.vercel.app`
+5. Click "Deploy Static Site"
+6. Wait for deployment (1-2 minutes)
+7. Copy your frontend URL: `https://bizquote-web.onrender.com`
 
-## Step 4: Update CORS (2 minutes)
+## Step 3: Update CORS on Backend (1 minute)
 
-1. Go back to Render dashboard
+**Note: CORS is already configured correctly in Step 1 with `https://bizquote-web.onrender.com`**
+
+If you used a different name for your frontend, update the backend's `CORS_ALLOWED_ORIGINS`:
+1. Go to Render dashboard
 2. Open your `bizquote-api` service
 3. Go to "Environment" section
-4. Update `CORS_ALLOWED_ORIGINS`:
-   ```
-   CORS_ALLOWED_ORIGINS=https://your-project.vercel.app
-   ```
+4. Update `CORS_ALLOWED_ORIGINS` to your actual frontend URL
 5. Click "Save Changes"
 6. Wait for redeploy
 
-## Step 5: Test Your Live App
+## Step 4: Test Your Live App
 
-1. Open your Vercel URL
+1. Open your Render frontend URL: `https://bizquote-web.onrender.com`
 2. Register a new account
 3. Login
 4. Create a customer
@@ -117,22 +93,22 @@ This guide will help you deploy the entire application in under 15 minutes using
 ## Total Cost: $0/month
 
 - MongoDB Atlas M0: Free
-- Render Free Tier: Free
-- Vercel Hobby: Free
+- Render Free Tier (Backend): Free
+- Render Free Tier (Frontend Static Site): Free
 
 ## Troubleshooting
 
 **Backend fails to start:**
 - Check Render logs for errors
 - Verify MONGO_URI is correct
-- Ensure MongoDB cluster is created
+- Ensure MongoDB cluster is created and active
 
 **Frontend can't connect to backend:**
-- Check CORS_ALLOWED_ORIGINS includes your Vercel URL
-- Verify VITE_API_BASE_URL is correct
-- Check backend is running (visit /api/health/)
+- Check CORS_ALLOWED_ORIGINS includes your Render frontend URL (bizquote-web.onrender.com)
+- Verify VITE_API_BASE_URL is correct (https://bizquote-api.onrender.com/api)
+- Check backend is running (visit https://bizquote-api.onrender.com/api/health/)
 
 **MongoDB connection error:**
-- Verify IP whitelist (0.0.0.0/0)
+- Verify IP whitelist (0.0.0.0/0) is set in MongoDB Atlas
 - Check username/password in connection string
 - Ensure cluster is created and active
