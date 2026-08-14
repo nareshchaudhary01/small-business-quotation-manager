@@ -13,3 +13,4 @@ wheel
 # Load environment variables from .env
 python-dotenv
 certifi
+whitenoise==6.5.0
